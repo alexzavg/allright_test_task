@@ -2,6 +2,7 @@ import { expect, type Locator, type Page } from '@playwright/test'
 import { QuizSelectors } from '../selectors/quiz.selectors'
 import { MAX_FUNNEL_STEPS, type FunnelEntry, type QuizProfile } from '../data/quiz.data'
 import { buildUniqueEmail, buildUniquePhone } from '../utils/dataGenerator'
+import { step } from '../utils/stepDecorator'
 
 const STEP_TRANSITION_TIMEOUT = 20_000
 const SELF_ADVANCE_TIMEOUT = 3_000
@@ -26,11 +27,13 @@ export class QuizPage {
     this.selectors = new QuizSelectors(page)
   }
 
+  @step('Open the {0.branch} sign-up funnel')
   async open(entry: FunnelEntry): Promise<void> {
     await this.page.goto(entry.path)
     await expect(this.selectors.optionButtons().first()).toBeVisible()
   }
 
+  @step('Choose the {0.branch} age branch')
   async chooseAgeBranch(entry: FunnelEntry): Promise<void> {
     const signature = await this.signature()
     await this.page.getByRole('button', { name: entry.ageOption }).click()
@@ -40,6 +43,7 @@ export class QuizPage {
     }
   }
 
+  @step('Complete the quiz funnel')
   async complete(profile: QuizProfile): Promise<QuizRunResult> {
     const email = buildUniqueEmail(profile.emailDomain)
     let phone = ''
@@ -65,7 +69,9 @@ export class QuizPage {
       const next = this.currentPath()
       if (!next.includes(SIGN_UP_PATH)) {
         if (next.includes(ABORTED_PATH)) {
-          throw new Error(`The funnel aborted to ${next}; the phone ${phone} is already in use`)
+          throw new Error(
+            `The funnel aborted to ${next}; the phone ${phone} is already in use`
+          )
         }
 
         return {
@@ -80,6 +86,7 @@ export class QuizPage {
     throw new Error(`The funnel did not finish within ${MAX_FUNNEL_STEPS} steps`)
   }
 
+  @step()
   private async answerCurrentScreen(
     profile: QuizProfile,
     email: string
@@ -111,6 +118,7 @@ export class QuizPage {
     return undefined
   }
 
+  @step()
   private async fillTextScreen(
     inputs: Locator,
     profile: QuizProfile,
@@ -133,6 +141,7 @@ export class QuizPage {
     return type === 'email' || /mail/i.test(placeholder)
   }
 
+  @step()
   private async fillPhoneScreen(): Promise<string> {
     const input = this.selectors.phoneInput().first()
     await expect(input).toHaveAttribute('placeholder', /^\+\d/)
@@ -152,6 +161,7 @@ export class QuizPage {
     return phone.formatted
   }
 
+  @step()
   private async chooseOption(profile: QuizProfile): Promise<void> {
     const signature = await this.signature()
     await (await this.preferredOption(profile)).click()
@@ -172,6 +182,7 @@ export class QuizPage {
     return options.first()
   }
 
+  @step()
   private async submitScreen(): Promise<void> {
     const cta = this.selectors.ctaButton()
 
@@ -186,6 +197,7 @@ export class QuizPage {
     return (await this.selectors.timeSlots().count()) > 0
   }
 
+  @step()
   private async bookFirstAvailableSlot(): Promise<void> {
     const days = this.selectors.bookingDays()
     const dayCount = await days.count()

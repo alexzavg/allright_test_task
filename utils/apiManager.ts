@@ -10,6 +10,8 @@ export class ApiManager {
   ) {}
 
   get allRight(): AllRightApi {
-    return (this.allRightApi ??= new AllRightApi(this.request, () => readAuthSession(this.page)))
+    return (this.allRightApi ??= new AllRightApi(this.request, () =>
+      readAuthSession(this.page)
+    ))
   }
 }

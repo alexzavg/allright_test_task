@@ -26,7 +26,10 @@ export interface CurrentUser {
 }
 
 export async function readAuthSession(page: Page): Promise<AuthSession> {
-  const raw = await page.evaluate(key => window.localStorage.getItem(key), SESSION_STORAGE_KEY)
+  const raw = await page.evaluate(
+    key => window.localStorage.getItem(key),
+    SESSION_STORAGE_KEY
+  )
   const authenticated = raw ? JSON.parse(raw).authenticated : undefined
 
   if (!authenticated?.access_token || !authenticated?.user_id) {
@@ -90,7 +93,9 @@ export class AllRightApi {
     return lessons.map(lesson => ({
       id: lesson.id,
       startsAt: String(lesson.attributes['time-start'] ?? ''),
-      tutorId: lesson.attributes['tutor-id'] ? String(lesson.attributes['tutor-id']) : undefined,
+      tutorId: lesson.attributes['tutor-id']
+        ? String(lesson.attributes['tutor-id'])
+        : undefined,
     }))
   }
 

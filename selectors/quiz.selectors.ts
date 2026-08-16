@@ -40,7 +40,9 @@ export class QuizSelectors {
   }
 
   timeSlots(): Locator {
-    return this.page.getByRole('button', { name: TIME_SLOT_LABEL }).filter({ visible: true })
+    return this.page
+      .getByRole('button', { name: TIME_SLOT_LABEL })
+      .filter({ visible: true })
   }
 
   bookingDays(): Locator {
